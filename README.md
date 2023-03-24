@@ -73,3 +73,6 @@ sudo python3 receiver.py -i en0 -pc 2 -p 72
 ## Output example:
 
 ![image](https://user-images.githubusercontent.com/66295316/227532825-039ba192-10b6-4688-bc9f-3c10fc7c8701.png)
+
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
