@@ -41,7 +41,7 @@ options:
                         Protocol to use: TCP or UDP
 ```
 
-### Reciever script:
+### Receiver script:
 
 ```
 usage: receiver.py [-h] [-i INTERFACE] [-pc PACKETSCOUNT] [-p PORT]
