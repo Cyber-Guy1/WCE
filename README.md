@@ -67,5 +67,5 @@ sudo python3 commander.py -c ls -t 192.168.1.1 -dp 72 -d 10 -s 192.168.1.10 -p 7
 - Victim machine:
 
 ```
-sudo python3 malware.py -i en0 -pc 2 -p 72
+sudo python3 receiver.py -i en0 -pc 2 -p 72
 ```
