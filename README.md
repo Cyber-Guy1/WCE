@@ -69,3 +69,7 @@ sudo python3 commander.py -c ls -t 192.168.1.1 -dp 72 -d 10 -s 192.168.1.10 -p 7
 ```
 sudo python3 receiver.py -i en0 -pc 2 -p 72
 ```
+
+## Output example:
+
+![image](https://user-images.githubusercontent.com/66295316/227532825-039ba192-10b6-4688-bc9f-3c10fc7c8701.png)
