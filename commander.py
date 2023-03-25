@@ -4,14 +4,30 @@ import socket
 import time
 import random
 import argparse
-import codecs
-import base64
 from colorama import Fore
 
 Reset = Fore.RESET
 Red = Fore.RED
 Green = Fore.GREEN
 Cyan = Fore.CYAN
+
+def ascii_art():
+    art = """
+                     .  WCE
+                    / V\\
+                  / `  /
+                 <<   |
+                 /    |
+               /      |
+             /        |
+           /    \\  \\ /
+          (      ) | |
+  ________|   _/_  | |
+<__________\\______)\\__)\\n
+- Created by Momen Eldawakhly (Cyber Guy)
+-- Samurai Digital Security
+    """
+    print(art)
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-c", "--command", help="Command to execute")
@@ -28,32 +44,8 @@ delay = args.delay
 src_ip = args.source
 src_port = args.port
 
-def ascii():
-    art = """
-                     .  WCE
-                    / V\\
-                  / `  /
-                 <<   |
-                 /    |
-               /      |
-             /        |
-           /    \  \ /
-          (      ) | |
-  ________|   _/_  | |
-<__________\______)\__)\n
-- Created by Momen Eldawakhly (Cyber Guy)
--- Samurai Digital Security
-    """
-    print(art)
-
 class TCPPacket:
-    def __init__(self,
-                 src_host,
-                 src_port,
-                 dst_host,
-                 dst_port,
-                 window,
-                 flags=0):
+    def __init__(self, src_host, src_port, dst_host, dst_port, window, flags=0):
         self.src_host = src_host
         self.src_port = src_port
         self.dst_host = dst_host
@@ -62,77 +54,46 @@ class TCPPacket:
         self.flags = flags
 
     def build(self):
-        packet = struct.pack(
-            '!HHIIHHHH',
-            self.src_port,        # Source Port
-            self.dst_port,        # Destination Port
-            random.randint(0, 2**32 - 1),  # Sequence Number
-            random.randint(0, 2**32 - 1),  # Acknowledgment Number
-            5 << 12 | 0b110000,   # Data Offset + Flags
-            self.window,          # Window
-            0,                    # Checksum (initial value)
-            0                     # Urgent pointer
-        )
+        packet = struct.pack('!HHIIHHHH', self.src_port, self.dst_port,
+                             random.randint(0, 2**32 - 1), random.randint(0, 2**32 - 1),
+                             5 << 12 | 0b110000, self.window, 0, 0)
 
-        # Pseudo header for checksum calculation
-        pseudo_hdr = struct.pack(
-        '!4s4sHH',
-        socket.inet_aton(self.src_host),    # Source Address
-        socket.inet_aton(self.dst_host),    # Destination Address
-        socket.IPPROTO_TCP,                 # Protocol ID
-        len(packet)                         # TCP Length
-        )
+        pseudo_hdr = struct.pack('!4s4sHH', socket.inet_aton(self.src_host),
+                                 socket.inet_aton(self.dst_host), socket.IPPROTO_TCP, len(packet))
 
         def chksum(packet):
-                if len(packet) % 2 != 0:
-                    packet += b'\0'
-                res = sum(array.array("H", packet))
-                res = (res >> 16) + (res & 0xffff)
-                res += res >> 16
-                return (~res) & 0xffff
+            if len(packet) % 2 != 0:
+                packet += b'\0'
+            res = sum(array.array("H", packet))
+            res = (res >> 16) + (res & 0xffff)
+            res += res >> 16
+            return (~res) & 0xffff
 
         checksum = chksum(pseudo_hdr + packet)
         packet = packet[:16] + struct.pack('H', checksum) + packet[18:]
         return packet
 
-dst = target
-if command == None:
-    ascii()
-    print(f"{Red}[-] Please specify IP to command. {Reset}".format())
-elif delay == None:
-    ascii()
-    print(f"{Red}[-] Please specify time to delay. {Reset}".format())
-elif src_ip == None:
-    ascii()
-    print(f"{Red}[-] Please specify source IP. {Reset}".format())
-elif src_port == None:
-    print(f"{Red}[-] Please specify source port. {Reset}".format())
+if not command or not delay or not src_ip or not src_port:
+    ascii_art()
+    if not command: print(f"{Red}[-] Please specify IP to command. {Reset}")
+    if not delay: print(f"{Red}[-] Please specify time to delay. {Reset}")
+    if not src_ip: print(f"{Red}[-] Please specify source IP. {Reset}")
+    if not src_port: print(f"{Red}[-] Please specify source port. {Reset}")
 else:
-    ascii()
-    print(Green + f"[+] Target: {Cyan + target + Reset}".format())
-    print(Green + f"[+] Command: {Cyan + command + Reset}".format())
-    print(Green + f"[+] Time to delay: {Cyan + delay + Reset}\n\n".format())
+    ascii_art()
+    print(f"{Green}[+] Target: {Cyan + target + Reset}")
+    print(f"{Green}[+] Command: {Cyan + command + Reset}")
+    print(f"{Green}[+] Time to delay: {Cyan + delay + Reset}\n\n")
 
-    with open("./cmd.sh", "w") as cm:
-        cm.write(command)
-    with open("./cmd.sh", "r") as fi:
-        fi = fi.read()
-    print(Green + f"[+] Unpacking {Cyan + command + Green} to be sent. {Reset}".format())
-    unpacked = [*fi]
-    print(Green + f"[+] Sending {Cyan + command + Reset + Green} with { Cyan + delay + Reset + Green} seconds to delay. {Reset}".format())
+    encoded_command = command.translate(str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                                                       'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'))
+    print(Green + f"[+] Unpacking {Cyan + command + Green} to be sent. {Reset}")
+    print(Green + f"[+] Sending {Cyan + command + Reset + Green} with { Cyan + delay + Reset + Green} seconds to delay. {Reset}")
 
-    for char in unpacked:
-        char = codecs.encode(char, 'rot_13')
+    for char in encoded_command:
         char_val = ord(char)
-        pak = TCPPacket(
-            src_ip,
-            src_port,
-            dst,
-            dst_port,
-            char_val
-        )
+        pak = TCPPacket(src_ip, src_port, target, dst_port, char_val)
         s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-        s.sendto(pak.build(), (dst, 0))
-        delay = int(delay)
-        time.sleep(delay)
-        print(Green + f"[+] Command {Cyan + command + Reset + Green} sent. {Reset}".format())
+        s.sendto(pak.build(), (target, 0))
+        time.sleep(int(delay))
+        print(Green + f"[+] Command {Cyan + command + Reset + Green} sent. {Reset}")
