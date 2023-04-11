@@ -43,8 +43,6 @@ options:
   -s SOURCE, --source SOURCE
                         Source IP
   -p PORT, --port PORT  Source port
-  -P {TCP,UDP}, --protocol {TCP,UDP}
-                        Protocol to use: TCP or UDP
 ```
 
 ### Receiver script:
