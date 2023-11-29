@@ -22,6 +22,8 @@ The WCE tool is designed to make exfiltration and network command more stealthy 
 
 This tool has some research behind it; check it out from here: https://samuraisecurity.co.uk/red-teaming-exfiltrating-data-command-network-nodes-like-a-ghost/
 
+WWHF Talk: https://wildwesthackinfest.com/event/exfiltrate-and-command-network-nodes-like-a-ghost/
+
 ## Usage
 ### Commander script:
 
